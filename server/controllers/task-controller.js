@@ -1,5 +1,3 @@
-
-
 const Joi = require("joi");
 const Task = require("../models/task");
 
@@ -60,8 +58,6 @@ const addNewTask = async (req, res) => {
   }
 };
 
-
-
 const getAllTasks = async (req, res) => {
   const { id } = req.params;
   console.log("Request parameters:", req.params);
@@ -103,10 +99,10 @@ const getAllTasks = async (req, res) => {
 
 // Update a task
 const updateTask = async (req, res) => {
-   // Use the id from req.params directly
-  const { title, description, status, priority, userId , _id} = await req.body;
-  console.log('Request Body:', req.body);
-  console.log('Request Params:', req.params);
+  // Use the id from req.params directly
+  const { title, description, status, priority, userId, _id } =  req.body;
+  console.log("Request Body:", req.body);
+  console.log("Request Params:", req.params);
   // Validate input
   const { error } = taskSchema.validate({
     title,
@@ -114,20 +110,25 @@ const updateTask = async (req, res) => {
     status,
     priority,
     userId,
-    
   });
   if (error) {
-    console.log('Validation Error:', error.details);
+    console.log("Validation Error:", error.details);
 
     return res.status(400).json({
       success: false,
       message: error.details[0].message,
     });
   }
+  if(!_id){
+    return res.status(400).json({
+      success:false,
+      message: "Task Id is required."
+    })
+  }
 
   try {
     const updateTask = await Task.findByIdAndUpdate(
-      {_id}, // Pass the id directly here
+      _id , // Pass the id directly here
       {
         title,
         description,
@@ -159,39 +160,37 @@ const updateTask = async (req, res) => {
   }
 };
 
-
-
-
 // Delete a task
 const deleteTask = async (req, res) => {
   const { id } = req.params;
 
-  try {
+  
     if (!id) {
       return res.status(400).json({
         success: false,
         message: "Task id is required ",
       });
     }
-    const deleteTask = await Task.findByIdAndDelete(id);
-    if (deleteTask) {
-      return res.status(200).json({
-        success: true,
-        message: "Task Deleted Successfully",
-      });
-    } else {
-      return res.status(400).json({
-        success: false,
-        message: "Some error occured ! Please try again ",
-      });
-    }
-  } catch (error) {
-    console.log(error);
-    return res.status(500).json({
-      success: false,
-      message: "Some error occurred! Please try again",
-    });
-  }
+      try {
+        const deletedTask = await Task.findByIdAndDelete(id);
+        if (deletedTask) {
+          return res.status(200).json({
+            success: true,
+            message: "Task Deleted Successfully",
+          });
+        } else {
+          return res.status(404).json({
+            success: false,
+            message: "Task not found!",
+          });
+        }
+      } catch (error) {
+        console.error(error);
+        return res.status(500).json({
+          success: false,
+          message: "An error occurred while deleting the task. Please try again.",
+        });
+      }
 };
 
 module.exports = { addNewTask, getAllTasks, updateTask, deleteTask };

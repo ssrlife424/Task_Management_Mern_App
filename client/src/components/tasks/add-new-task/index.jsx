@@ -7,7 +7,8 @@ function AddNewTask({
   handleSubmit,
   taskFormData,
   currentEditedId,
-  setCurrentEditedId
+  setCurrentEditedId,
+  description
 }) {
   return (
     <CommonDialog
@@ -18,6 +19,7 @@ function AddNewTask({
         currentEditedId ? taskFormData.reset() : null;
         setCurrentEditedId(null);
       }}
+      description="Fill in the details of the task you want to add."
 
       title={currentEditedId ? "Edit Task" : " Post New Task "}
       btnText={"Add"}

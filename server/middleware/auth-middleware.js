@@ -1,5 +1,6 @@
 const jwt = require("jsonwebtoken");
 const user = require("../models/user");
+require("dotenv").config();
 
 const userAuthVerification = async (req, res) => {
   const token = req.cookies.token;
@@ -10,18 +11,24 @@ const userAuthVerification = async (req, res) => {
       message: "Token is not available or Invalid Token",
     });
   }
-  if (token) {
+  
     try {
-      const decoded = jwt.verify(token, "DEFAULT_SECRET_KEY");
-      console.log(decoded, 'decoded');
+      const decoded = jwt.verify(token, process.env.JWT_SECRET);
+      console.log(decoded, "decoded");
       const userInfo = await user.findById(decoded.getId);
-      console.log(userInfo, 'userInfo');
+      console.log(userInfo, "userInfo");
 
-      if (userInfo)
+      if (userInfo) {
         return res.status(200).json({
           success: true,
           userInfo,
         });
+      }else{
+        return res.status(404).json({
+          success: false,
+          message: "User not found"
+        })
+      }
     } catch (error) {
       return res.status(401).json({
         success: false,
@@ -29,6 +36,5 @@ const userAuthVerification = async (req, res) => {
       });
     }
   }
-};
 
 module.exports = { userAuthVerification };

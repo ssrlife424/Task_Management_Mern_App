@@ -2,6 +2,8 @@ const Joi = require("joi");
 const User = require("../models/user");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
+const dotenv = require('dotenv');
+dotenv.config()
 
 const registerSchema = Joi.object({
   name: Joi.string().required(),
@@ -15,13 +17,13 @@ const loginSchema = Joi.object({
 });
 
 const generateToken = (getId) => {
-  return jwt.sign({ getId }, "DEFAULT_SECRET_KEY", {
-    expiresIn: 3 * 24 * 60 * 60,
+  return jwt.sign({ getId }, process.env.JWT_SECRET, {
+    expiresIn: "3d",
   });
 };
 
 const registerUser = async (req, res) => {
-  const { name, email, password } = req.body;
+  const { name, email, password } = await req.body;
 
   const { error } = registerSchema.validate({ name, email, password });
 
@@ -51,7 +53,9 @@ const registerUser = async (req, res) => {
       const token = generateToken(newlyCreatedUser?._id);
       res.cookie("token", token, {
         withCredentials: true,
-        httpOnly: false,
+        httpOnly: true,
+        secure: true, // Use secure cookies in production
+        sameSite: "None",
       });
 
       return res.status(201).json({
@@ -74,7 +78,7 @@ const registerUser = async (req, res) => {
 };
 
 const loginUser = async (req, res) => {
-  const { email, password } = req.body;
+  const { email, password } =  await req.body;
   const { error } = loginSchema.validate({ email, password });
 
   if (error) {
@@ -106,7 +110,9 @@ const loginUser = async (req, res) => {
     const token = generateToken(getUser?._id);
     res.cookie("token", token, {
       withCredentials: true,
-      httpOnly: false,
+      httpOnly: true,
+      secure: true, // Use secure cookies in production
+      sameSite: "None",
     });
 
     return res.status(200).json({
@@ -125,7 +131,9 @@ const loginUser = async (req, res) => {
 const logout = async (req, res) => {
   res.cookie("token", "", {
     withCredentials: true,
-    httpOnly: false,
+    httpOnly: true,
+    secure: true, // Use secure cookies in production
+    sameSite: "None",
   });
 
   return res.status(200).json({

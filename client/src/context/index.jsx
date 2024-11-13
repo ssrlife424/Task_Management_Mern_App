@@ -24,18 +24,25 @@ function TaskManagerProvider({ children }) {
 
   useEffect(() => {
     const verifyUserCookie = async () => {
-      const data = await callUserAuthApi();
-      // console.log(data, "verifyUserCookie");
-      if (data?.userInfo) {
-        setUser(data.userInfo);
+      try {
+        setLoading(true);
+        const data = await callUserAuthApi();
+        if (data?.userInfo) {
+          setUser (data.userInfo);
+        }
+        return data?.success
+          ? navigate(
+              location.pathname === "/auth" || location.pathname === "/"
+                ? "tasks/list"
+                : `${location.pathname}`
+            )
+          : navigate("/auth");
+      } catch (error) {
+        console.error("Error verifying user:", error);
+        navigate("/auth");
+      } finally {
+        setLoading(false);
       }
-      return data?.success
-        ? navigate(
-            location.pathname === "/auth" || location.pathname === "/"
-              ? "tasks/list"
-              : `${location.pathname}`
-          )
-        : navigate("/auth");
     };
     verifyUserCookie();
   }, [navigate, location.pathname]);

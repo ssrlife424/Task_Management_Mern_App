@@ -8,6 +8,7 @@ function TaskItem({
   setShowDialog,
   setCurrentEditedId,
   taskFormData,
+
 }) {
   return (
     <CommonCard
