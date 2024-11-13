@@ -25,6 +25,7 @@ export const callUserAuthApi = async () => {
     { withCredentials: true }
   );
   return response?.data;
+  console.log(data);
 };
 
 export const callLogoutApi = async (req, res) => {

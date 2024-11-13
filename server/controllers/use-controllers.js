@@ -22,7 +22,7 @@ const generateToken = (getId) => {
 
 const registerUser = async (req, res) => {
   const { name, email, password } = req.body;
-  
+
   const { error } = registerSchema.validate({ name, email, password });
 
   if (error) {
@@ -123,7 +123,7 @@ const loginUser = async (req, res) => {
 };
 
 const logout = async (req, res) => {
-  res.cookie('token', "", {
+  res.cookie("token", "", {
     withCredentials: true,
     httpOnly: false,
   });
