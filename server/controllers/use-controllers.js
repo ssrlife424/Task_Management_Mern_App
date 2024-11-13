@@ -2,9 +2,6 @@ const Joi = require("joi");
 const User = require("../models/user");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
-// to register an user
-// to login an user
-// logout
 
 const registerSchema = Joi.object({
   name: Joi.string().required(),
@@ -23,9 +20,9 @@ const generateToken = (getId) => {
   });
 };
 
-const registerUser = async (req, res, next) => {
-  const { name, email, password } = await req.body;
-
+const registerUser = async (req, res) => {
+  const { name, email, password } = req.body;
+  
   const { error } = registerSchema.validate({ name, email, password });
 
   if (error) {
@@ -41,7 +38,7 @@ const registerUser = async (req, res, next) => {
     if (isUserEmailAlreadyExists) {
       return res.status(400).json({
         success: false,
-        message: "Email already exists ! Please try with different email",
+        message: "Email already exists! Please try with a different email.",
       });
     } else {
       const hashPassword = await bcrypt.hash(password, 12);
@@ -51,39 +48,33 @@ const registerUser = async (req, res, next) => {
         password: hashPassword,
       });
 
-      if (newlyCreatedUser) {
-        const token = generateToken(newlyCreatedUser?._id);
+      const token = generateToken(newlyCreatedUser?._id);
+      res.cookie("token", token, {
+        withCredentials: true,
+        httpOnly: false,
+      });
 
-        res.cookie("token", token, {
-          withCredentials: true,
-          httpOnly: false,
-        });
-        res.status(201).json({
-          success: true,
-          message: "User registeration successful",
-          userData: {
-            name: newlyCreatedUser.name,
-            email: newlyCreatedUser.email,
-            _id: newlyCreatedUser._id,
-          },
-        });
-        next();
-      }
+      return res.status(201).json({
+        success: true,
+        message: "User registration successful",
+        userData: {
+          name: newlyCreatedUser.name,
+          email: newlyCreatedUser.email,
+          _id: newlyCreatedUser._id,
+        },
+      });
     }
   } catch (error) {
-    console.log(error);
-
+    console.error(error);
     return res.status(500).json({
       success: false,
-      message: "Something went wrong ! Please try again",
+      message: "Something went wrong! Please try again.",
     });
   }
 };
 
-//Login user Page
-
-const loginUser = async (req, res, next) => {
-  const { email, password } = await req.body;
+const loginUser = async (req, res) => {
+  const { email, password } = req.body;
   const { error } = loginSchema.validate({ email, password });
 
   if (error) {
@@ -92,52 +83,55 @@ const loginUser = async (req, res, next) => {
       message: error.details[0].message,
     });
   }
+
   try {
     const getUser = await User.findOne({ email });
+
     if (!getUser) {
-      return res.json({
-        message: "Inorrect email",
+      return res.status(400).json({
         success: false,
+        message: "Incorrect email",
       });
     }
+
     const checkAuth = await bcrypt.compare(password, getUser.password);
+
     if (!checkAuth) {
-      return res.json({
-        message: "Incorrect password",
+      return res.status(400).json({
         success: false,
+        message: "Incorrect password",
       });
     }
 
     const token = generateToken(getUser?._id);
-
     res.cookie("token", token, {
       withCredentials: true,
       httpOnly: false,
     });
-    res.status(201).json({
-      success: true,
-      message: "User Logged in ",
-    });
-    next()
-  } catch (error) {
-    console.log(error);
 
+    return res.status(200).json({
+      success: true,
+      message: "User logged in",
+    });
+  } catch (error) {
+    console.error(error);
     return res.status(500).json({
       success: false,
-      message: "Something went wrong ! Please try again",
+      message: "Something went wrong! Please try again.",
     });
   }
 };
 
-
-const logout = async(req,res)=>{
-  res.cookie('token',"",{
+const logout = async (req, res) => {
+  res.cookie('token', "", {
     withCredentials: true,
     httpOnly: false,
-})
-return res.status(200).json({
-  success: true,
-  message: "Logout Successfully",
-})
-}
-module.exports = { registerUser, loginUser , logout };
+  });
+
+  return res.status(200).json({
+    success: true,
+    message: "Logout successful",
+  });
+};
+
+module.exports = { registerUser, loginUser, logout };
