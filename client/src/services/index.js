@@ -74,7 +74,7 @@ import axios from "axios";
 
 // Set the base URL for Axios
 const api = axios.create({
-  baseURL: "http://localhost:5000/api",
+  baseURL: "https://task-management-mern-app-z6q3.onrender.com/api",
   withCredentials: true, // Set this globally if needed
 });
 
