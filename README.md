@@ -1,5 +1,3 @@
-best readme file banao task management app ke liye
-Sure, here's an engaging and professional README.md file for your Task Management App that will help attract potential employers:
 
 🗂️ Task Management App
 Introduction
