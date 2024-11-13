@@ -41,7 +41,7 @@ Installation
 Clone the repository:
 
 bash
-git clone https://github.com/yourusername/task-management-app.git
+git clone https://github.com/ssrlife424/task-management-app.git
 cd task-management-app
 Install dependencies for the client and server:
 
@@ -59,37 +59,6 @@ Set up environment variables: Create a .env file in the server directory and add
 MONGO_URI=your_mongo_db_connection_string
 JWT_SECRET=your_jwt_secret
 Run the application:
-
-bash
-# Start the server
-cd server
-npm start
-
-# Start the client
-cd ../client
-npm start
-Access the application: Open your browser and go to http://localhost:3000
-
-📦 Deployment
-Frontend (Netlify)
-Base directory: client
-
-Build command: npm run build
-
-Publish directory: client/build
-
-Backend (Heroku)
-Create a Procfile in the server folder:
-
-plaintext
-web: node server.js
-Set environment variables on Heroku:
-
-MONGO_URI
-
-JWT_SECRET
-
-Deploy to Heroku: Follow the Heroku deployment steps.
 
 🤝 Contributing
 Contributions are welcome! If you have any suggestions, bug reports, or feature requests, feel free to create an issue or submit a pull request.
